@@ -24,6 +24,8 @@ namespace App\Http\Controllers;
  *     description="Authentification via Laravel Sanctum. Format : Bearer {votre_token}"
  * )
  */
-abstract class Controller
-{
+
+
+
+abstract class Controller{
 }
