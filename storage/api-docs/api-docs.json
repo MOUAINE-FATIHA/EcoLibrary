@@ -1,0 +1,812 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "EcoLibrary API",
+        "description": "API de gestion d'une bibliothèque — catégories, livres, disponibilité et état de la collection.",
+        "contact": {
+            "email": "admin@ecolibrary.com"
+        },
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://project.test/api/v1",
+            "description": "Serveur local de développement"
+        }
+    ],
+    "paths": {
+        "/api/admin/stats": {
+            "get": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Statistiques globales de la bibliothèque",
+                "operationId": "9aca7d759e1013283b1ac06be9bfc586",
+                "responses": {
+                    "200": {
+                        "description": "Statistiques",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_livres": {
+                                            "type": "integer",
+                                            "example": 150
+                                        },
+                                        "total_categories": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total_exemplaires": {
+                                            "type": "integer",
+                                            "example": 450
+                                        },
+                                        "exemplaires_dispo": {
+                                            "type": "integer",
+                                            "example": 380
+                                        },
+                                        "exemplaires_degrades": {
+                                            "type": "integer",
+                                            "example": 25
+                                        },
+                                        "taux_disponibilite": {
+                                            "type": "string",
+                                            "example": "84.44%"
+                                        },
+                                        "livres_populaires": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Livre"
+                                            }
+                                        },
+                                        "stats_par_categorie": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/livres/degrades": {
+            "get": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Rapport des livres dégradés",
+                "operationId": "f0b779f9d358d18fb83c1c669a617f2f",
+                "responses": {
+                    "200": {
+                        "description": "Livres avec exemplaires dégradés, triés du plus dégradé au moins"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Inscrire un nouvel utilisateur",
+                "operationId": "8a56853624e025573120a09a4c75d468",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Fatiha Benali"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "fatiha@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "secret123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "admin",
+                                            "lecteur"
+                                        ],
+                                        "example": "lecteur"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilisateur créé avec succès"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Se connecter",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "fatiha@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie, retourne le token"
+                    },
+                    "422": {
+                        "description": "Identifiants incorrects"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Se déconnecter",
+                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Profil de l'utilisateur connecté",
+                "operationId": "9d9bc556f927575aa492a88c28fe5908",
+                "responses": {
+                    "200": {
+                        "description": "Informations de l'utilisateur"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/categories": {
+            "get": {
+                "tags": [
+                    "Catégories"
+                ],
+                "summary": "Lister toutes les catégories",
+                "operationId": "3f5817a34833d0a1f4af4548dd3aeaba",
+                "responses": {
+                    "200": {
+                        "description": "Liste des catégories",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Categorie"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Catégories"
+                ],
+                "summary": "Créer une catégorie (admin)",
+                "operationId": "71fcad552bb0eaba9fb191fd8d8dcab0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Categorie"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Catégorie créée"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Catégories"
+                ],
+                "summary": "Afficher une catégorie avec ses livres",
+                "operationId": "c68e76d323c008827a9e47398b1583de",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détail de la catégorie"
+                    },
+                    "404": {
+                        "description": "Catégorie introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Catégories"
+                ],
+                "summary": "Modifier une catégorie (admin)",
+                "operationId": "0e686b2748211cc688333ed705dc111f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Categorie"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Catégorie mise à jour"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "404": {
+                        "description": "Catégorie introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Catégories"
+                ],
+                "summary": "Supprimer une catégorie (admin)",
+                "operationId": "4c12e22a7f8c617bd83bfa1fdc05428d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Catégorie supprimée"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "404": {
+                        "description": "Catégorie introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/livres": {
+            "get": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Lister tous les livres",
+                "operationId": "870f42bc4bad65bdcf897f8c5d56a6de",
+                "parameters": [
+                    {
+                        "name": "categorie_id",
+                        "in": "query",
+                        "description": "Filtrer par catégorie",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "disponible",
+                        "in": "query",
+                        "description": "Uniquement les disponibles",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des livres"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Ajouter un livre (admin)",
+                "operationId": "eae8b1da3d6e78603a9ceb4a1eb1ed27",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Livre"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Livre créé"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/livres/{id}": {
+            "get": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Afficher un livre",
+                "operationId": "9b10c690d5c3817c8f0fa3207d247b1d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détail du livre"
+                    },
+                    "404": {
+                        "description": "Livre introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Modifier un livre (admin)",
+                "operationId": "2a75c778f322b16ea9a9eb2db0d41224",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Livre"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Livre mis à jour"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "404": {
+                        "description": "Livre introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Supprimer un livre (admin)",
+                "operationId": "25191814632cc1504f3e3ac94e3bed87",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Livre supprimé"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "404": {
+                        "description": "Livre introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/livres/recherche": {
+            "get": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Rechercher un livre par titre ou catégorie",
+                "operationId": "595023679598e92b42a2c3fd15a79225",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Mot clé",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Résultats de recherche"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/livres/populaires": {
+            "get": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Livres les plus consultés",
+                "operationId": "54fa4ddc3fd5a2d35c5d0bf8074934cd",
+                "parameters": [
+                    {
+                        "name": "limite",
+                        "in": "query",
+                        "description": "Nombre de résultats (défaut 10)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Livres populaires"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/livres/recents": {
+            "get": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Nouveaux arrivages",
+                "operationId": "357b5752806bc3f641d02c8bc9260472",
+                "parameters": [
+                    {
+                        "name": "jours",
+                        "in": "query",
+                        "description": "Nombre de jours (défaut 30)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Livres récents"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Categorie": {
+                "required": [
+                    "nom"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nom": {
+                        "type": "string",
+                        "example": "Roman"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Livres de fiction narrative"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "datetime"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "datetime"
+                    }
+                },
+                "type": "object"
+            },
+            "Livre": {
+                "required": [
+                    "categorie_id",
+                    "titre",
+                    "auteur"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "categorie_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "titre": {
+                        "type": "string",
+                        "example": "Le Petit Prince"
+                    },
+                    "auteur": {
+                        "type": "string",
+                        "example": "Antoine de Saint-Exupéry"
+                    },
+                    "isbn": {
+                        "type": "string",
+                        "example": "978-2-07-040850-4"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Un conte poétique et philosophique"
+                    },
+                    "total_exemplaires": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "exemplaires_dispo": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "exemplaires_degrades": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nb_consultations": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "date_publication": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1943-04-06"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "datetime"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "datetime"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "Token",
+                "description": "Entrez votre token Sanctum : Bearer {token}"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Administration",
+            "description": "Statistiques et rapports (admin uniquement)"
+        },
+        {
+            "name": "Authentification",
+            "description": "Inscription, connexion et déconnexion"
+        },
+        {
+            "name": "Catégories",
+            "description": "Gestion des catégories de livres"
+        },
+        {
+            "name": "Livres",
+            "description": "Gestion des livres de la bibliothèque"
+        }
+    ],
+    "security": [
+        {
+            "sanctum": []
+        }
+    ]
+}
