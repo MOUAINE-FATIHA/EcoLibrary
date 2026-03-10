@@ -10,8 +10,7 @@ use Illuminate\Validation\ValidationException;
 /**
  * @OA\Tag(name="Authentification", description="Inscription, connexion et déconnexion")
  */
-class AuthController extends Controller
-{
+class AuthController extends Controller{
     /**
      * @OA\Post(
      *     path="/api/register",
@@ -21,9 +20,9 @@ class AuthController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"name","email","password"},
-     *             @OA\Property(property="name", type="string", example="Fatiha Benali"),
-     *             @OA\Property(property="email", type="string", example="fatiha@example.com"),
-     *             @OA\Property(property="password", type="string", example="secret123"),
+     *             @OA\Property(property="name", type="string", example="Fatiha mouaine"),
+     *             @OA\Property(property="email", type="string", example="fatiha@gmail.com"),
+     *             @OA\Property(property="password", type="string", example="fatiha123"),
      *             @OA\Property(property="role", type="string", enum={"admin","lecteur"}, example="lecteur")
      *         )
      *     ),
@@ -34,25 +33,25 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $data = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
+            'name'=> 'required|string|max:255',
+            'email'=> 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'role'     => 'in:admin,lecteur',
+            'role'=> 'in:admin,lecteur',
         ]);
 
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
+            'name'=> $data['name'],
+            'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role'     => $data['role'] ?? 'lecteur',
+            'role' => $data['role'] ?? 'lecteur',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Inscription réussie',
-            'token'   => $token,
-            'user'    => $user,
+            'token'=> $token,
+            'user' => $user,
         ], 201);
     }
 
@@ -65,8 +64,8 @@ class AuthController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"email","password"},
-     *             @OA\Property(property="email", type="string", example="fatiha@example.com"),
-     *             @OA\Property(property="password", type="string", example="secret123")
+     *             @OA\Property(property="email", type="string", example="fatiha@gmail.com"),
+     *             @OA\Property(property="password", type="string", example="fatiha123")
      *         )
      *     ),
      *     @OA\Response(response=200, description="Connexion réussie, retourne le token"),
@@ -76,7 +75,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'email'  => 'required|email',
             'password' => 'required|string',
         ]);
 
@@ -87,16 +86,14 @@ class AuthController extends Controller
                 'email' => ['Les identifiants sont incorrects.'],
             ]);
         }
-
-        // Révoquer les anciens tokens
         $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Connexion réussie',
-            'token'   => $token,
-            'user'    => $user,
+            'token'  => $token,
+            'user'  => $user,
         ]);
     }
 
