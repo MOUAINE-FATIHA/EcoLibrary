@@ -44,20 +44,17 @@ class Livre extends Model
     ];
 
     protected $casts = [
-        'date_publication'    => 'date',
-        'total_exemplaires'   => 'integer',
-        'exemplaires_dispo'   => 'integer',
+        'date_publication' => 'date',
+        'total_exemplaires'=> 'integer',
+        'exemplaires_dispo' => 'integer',
         'exemplaires_degrades'=> 'integer',
-        'nb_consultations'    => 'integer',
+        'nb_consultations' => 'integer',
     ];
-
-    // ─── Relations ───────────────────────────────────────────────
     public function categorie()
     {
         return $this->belongsTo(Category::class, 'categorie_id');
     }
 
-    // ─── Scopes ──────────────────────────────────────────────────
 
     /** Livres ayant au moins 1 exemplaire disponible */
     public function scopeDisponible($query)
@@ -74,8 +71,7 @@ class Livre extends Model
     /** Nouveaux arrivages (30 derniers jours par défaut) */
     public function scopeRecent($query, $jours = 30)
     {
-        return $query->where('created_at', '>=', now()->subDays($jours))
-                     ->orderByDesc('created_at');
+        return $query->where('created_at', '>=', now()->subDays($jours))->orderByDesc('created_at');
     }
 
     /** Livres ayant des exemplaires dégradés */
