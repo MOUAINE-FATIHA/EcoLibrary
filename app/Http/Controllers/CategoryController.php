@@ -31,6 +31,8 @@ class CategoryController extends Controller
         return CategoryResource::collection($categories);
     }
 
+
+
     /**
      * @OA\Post(
      *     path="/api/categories",
@@ -103,6 +105,6 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
-        return response()->json(['message' => 'Catégorie supprimée avec succès']);
+        return response()->json(['message'=> 'Catégorie étais supprimée']);
     }
 }
