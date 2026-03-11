@@ -25,13 +25,10 @@ class CategoryController extends Controller
      *     )
      * )
      */
-    public function index()
-    {
+    public function index(){
         $categories = Category::withCount('livres')->orderBy('nom')->get();
         return CategoryResource::collection($categories);
     }
-
-
 
     /**
      * @OA\Post(
@@ -48,8 +45,7 @@ class CategoryController extends Controller
      *     @OA\Response(response=422, description="Erreur de validation")
      * )
      */
-    public function store(StoreCategoryRequest $request)
-    {
+    public function store(StoreCategoryRequest $request){
         $category = Category::create($request->validated());
         return new CategoryResource($category);
     }
@@ -65,8 +61,7 @@ class CategoryController extends Controller
      *     @OA\Response(response=404, description="Catégorie introuvable")
      * )
      */
-    public function show(Category $category)
-    {
+    public function show(Category $category){
         $category->load('livres');
         return new CategoryResource($category);
     }
@@ -84,12 +79,10 @@ class CategoryController extends Controller
      *     @OA\Response(response=404, description="Catégorie introuvable")
      * )
      */
-    public function update(StoreCategoryRequest $request, Category $category)
-    {
+    public function update(StoreCategoryRequest $request, Category $category){
         $category->update($request->validated());
         return new CategoryResource($category);
     }
-
     /**
      * @OA\Delete(
      *     path="/api/categories/{id}",
@@ -102,8 +95,7 @@ class CategoryController extends Controller
      *     @OA\Response(response=404, description="Catégorie introuvable")
      * )
      */
-    public function destroy(Category $category)
-    {
+    public function destroy(Category $category){
         $category->delete();
         return response()->json(['message'=> 'Catégorie étais supprimée']);
     }
