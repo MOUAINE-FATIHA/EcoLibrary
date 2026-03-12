@@ -49,7 +49,9 @@ class Livre extends Model
         'nb_consultations' => 'integer',
     ];
     public function categorie(){
-        return $this->belongsTo(Category::class,'categorie_id');
+
+        return 
+        $this->belongsTo(Category::class,'categorie_id');
     }
 
 
