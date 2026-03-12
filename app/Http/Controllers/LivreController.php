@@ -24,14 +24,12 @@ class LivreController extends Controller
      *     @OA\Response(response=200, description="Liste des livres")
      * )
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         $query = Livre::with('categorie');
 
         if ($request->filled('categorie_id')) {
             $query->where('categorie_id', $request->categorie_id);
         }
-
         if ($request->boolean('disponible')) {
             $query->disponible();
         }
@@ -70,9 +68,8 @@ class LivreController extends Controller
      *     @OA\Response(response=404, description="Livre introuvable")
      * )
      */
-    public function show(Livre $livre)
-    {
-        // Incrémenter le compteur de consultations
+    public function show(Livre $livre){
+        //l'incrementation du cmp de consultations
         $livre->increment('nb_consultations');
         $livre->load('categorie');
         return new LivreResource($livre);
@@ -139,7 +136,6 @@ class LivreController extends Controller
 
         return LivreResource::collection($livres);
     }
-
     /**
      * @OA\Get(
      *     path="/api/livres/populaires",
@@ -167,10 +163,9 @@ class LivreController extends Controller
      *     @OA\Response(response=200, description="Livres récents")
      * )
      */
-    public function recents(Request $request)
-    {
-        $jours  = $request->integer('jours', 30);
-        $livres = Livre::with('categorie')->recent($jours)->get();
+    public function recents(Request $request){
+        $jours= $request->integer('jours', 30);
+        $livres  = Livre::with('categorie')->recent($jours)->get();
         return LivreResource::collection($livres);
     }
 }
