@@ -58,16 +58,19 @@ class Livre extends Model
     /** Livres ayant au moins 1 exemplaire disponible */
     public function scopeDisponible($query){
         return $query->where('exemplaires_dispo','>', 0);
+
     }
 
     /** Livres les plus consultés */
     public function scopePopulaire($query, $limite = 10){
-        return $query->orderByDesc('nb_consultations')->limit($limite);
+        return 
+        $query->orderByDesc('nb_consultations')->limit($limite);
     }
 
     /** Nouveaux arrivages (30 derniers jours par défaut) */
     public function scopeRecent($query, $jours = 30){
-        return $query->where('created_at','>=', now()->subDays($jours))->orderByDesc('created_at');
+        return 
+        $query->where('created_at','>=', now()->subDays($jours))->orderByDesc('created_at');
     }
 
     /** Livres ayant des exemplaires dégradés */
