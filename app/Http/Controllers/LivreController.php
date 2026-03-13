@@ -142,30 +142,28 @@ class LivreController extends Controller
      *     tags={"Livres"},
      *     summary="Livres les plus consultés",
      *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="limite", in="query", description="Nombre de résultats (défaut 10)", @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="limite", in="query", description="Nombre de résultats", @OA\Schema(type="integer")),
      *     @OA\Response(response=200, description="Livres populaires")
      * )
      */
-    public function populaires(Request $request)
-    {
-        $limite = $request->integer('limite', 10);
-        $livres = Livre::with('categorie')->populaire($limite)->get();
+    public function populaires (Request $request){
+        $limite  = $request->integer('limite', 10);
+        $livres=Livre::with('categorie')->populaire($limite)->get();
         return LivreResource::collection($livres);
     }
-
     /**
      * @OA\Get(
      *     path="/api/livres/recents",
      *     tags={"Livres"},
      *     summary="Nouveaux arrivages",
      *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="jours", in="query", description="Nombre de jours (défaut 30)", @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="jours", in="query", description="Nombre de jours", @OA\Schema(type="integer")),
      *     @OA\Response(response=200, description="Livres récents")
      * )
      */
     public function recents(Request $request){
-        $jours= $request->integer('jours', 30);
-        $livres  = Livre::with('categorie')->recent($jours)->get();
+        $jours= $request->integer('jours',30);
+        $livres= Livre::with('categorie')->recent($jours)->get();
         return LivreResource::collection($livres);
     }
 }
