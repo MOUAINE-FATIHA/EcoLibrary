@@ -26,14 +26,12 @@ class LivreController extends Controller
      */
     public function index(Request $request){
         $query = Livre::with('categorie');
-
         if ($request->filled('categorie_id')) {
             $query->where('categorie_id', $request->categorie_id);
         }
         if ($request->boolean('disponible')) {
             $query->disponible();
         }
-
         $livres = $query->orderBy('titre')->paginate(15);
         return LivreResource::collection($livres);
     }

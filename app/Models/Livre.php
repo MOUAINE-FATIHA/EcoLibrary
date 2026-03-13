@@ -48,25 +48,18 @@ class Livre extends Model
         'exemplaires_degrades'=> 'integer',
         'nb_consultations' => 'integer',
     ];
-    public function categorie(){
-
-        return 
+    public function categorie(){ return 
         $this->belongsTo(Category::class,'categorie_id');
     }
-
-
     /** Livres ayant au moins 1 exemplaire disponible */
     public function scopeDisponible($query){
-
         return $query->where('exemplaires_dispo','>', 0);
-
     }
 
     /** Livres les plus consultés */
     public function scopePopulaire($query, $limite = 10){
         return $query->orderByDesc('nb_consultations')->limit($limite);
     }
-
     /** Nouveaux arrivages (30 derniers jours par défaut) */
     public function scopeRecent($query, $jours = 30){
         return $query->where('created_at','>=', now()->subDays($jours))->orderByDesc('created_at');

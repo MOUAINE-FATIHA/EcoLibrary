@@ -10,7 +10,7 @@ class AdminMiddleware
     {
         if (! $request->user() || ! $request->user()->estAdmin()) {
             return response()->json([
-                'message' => 'Accès refusé. Réservé aux administrateurs.'
+                'message'=> 'Accès refusé. Réservé aux administrateurs.'
             ], 403);
         }
 
