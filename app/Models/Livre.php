@@ -57,6 +57,7 @@ class Livre extends Model
 
     /** Livres ayant au moins 1 exemplaire disponible */
     public function scopeDisponible($query){
+
         return $query->where('exemplaires_dispo','>', 0);
 
     }
